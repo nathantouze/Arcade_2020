@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <cstring>
-#include "ILibIO.hpp"
+#include "IDisplayModule.hpp"
 #include "DLLoader.hpp"
 #include "Entity.hpp"
 #include "Core.hpp"
@@ -26,13 +26,15 @@ int main(int ac, char **av)
         return (84);
     }
     try {
-        DLLoader<ILibIO> lib = DLLoader<ILibIO>(av[1]);
-        ILibIO *libGraphical = lib.getInstance("entryPoint");
+        DLLoader<IDisplayModule> lib = DLLoader<IDisplayModule>(av[1]);
+        IDisplayModule *libGraphical = lib.getInstance("entryPoint");
         Core core(libGraphical);
         core.loopCore();
     } catch (DLLoaderException &e) {
         std::cerr << e.getComponent() << " : " << e.what() << std::endl;
         return (84);
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
     }
     return (0);
 }

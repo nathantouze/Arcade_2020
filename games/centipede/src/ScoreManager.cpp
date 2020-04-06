@@ -6,15 +6,9 @@
 */
 
 #include "ScoreManager.hpp"
-#include "ScoreModule/ScoreModule.hpp"
 
 ScoreManager::ScoreManager()
 {
-}
-
-void ScoreManager::saveScore(const std::string &playerName) const
-{
-    ScoreModule::encryptScore("lib_arcade_centipede.so", playerName, _score);
 }
 
 void ScoreManager::resetScore()

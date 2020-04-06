@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 void ScoreModule::encryptScore(const std::string &gameName, const std::string &playerName, int playerScore)
 {
@@ -39,9 +40,14 @@ void ScoreModule::encryptScore(const std::string &gameName, const std::string &p
     }
 }
 
-const std::unordered_map<std::string, int> ScoreModule::getScoreOfGame(const std::string &gameName)
+bool sortScore(std::pair<std::string, std::string> i, std::pair<std::string, std::string> j) 
+{ 
+    return (stoi(i.second) > stoi(j.second));
+}
+
+const std::vector<std::pair<std::string, std::string>> ScoreModule::getScoreOfGame(const std::string &gameName)
 {
-    std::unordered_map<std::string, int> mapScore;
+    std::vector<std::pair<std::string, std::string>> mapScore;
     FileManager file("assets/.res.son");
     
     try {
@@ -50,9 +56,11 @@ const std::unordered_map<std::string, int> ScoreModule::getScoreOfGame(const std
             if (it.substr(0, gameName.size()) == gameName) {
                 std::vector<std::string> stringCut = splitWithChar(it, ' ');
                 if (stringCut[0] == gameName)
-                    mapScore[stringCut[1]] = decryptNumber(stringCut[2]);
+                    mapScore.push_back({stringCut[1], stringCut[2]});
             }
         }
+        std::sort(mapScore.begin(), mapScore.end(), sortScore);
+
     } catch (std::exception &e) {
 
     }

@@ -8,30 +8,35 @@
 #ifndef MENUARCADE_HPP_
 #define MENUARCADE_HPP_
 
-#include "Event.hpp"
+#include "KeyBind.hpp"
 #include "MenuInfo.hpp"
-#include "ILibIO.hpp"
-#include "ILibGame.hpp"
+#include "IGameModule.hpp"
+#include "IDisplayModule.hpp"
+#include "DLLoader.hpp"
+#include "DLLoaderException.hpp"
 #include "ScoreModule/ScoreModule.hpp"
 
 class MenuArcade {
     public:
         MenuArcade();
         void launchMenu();
-        void eventListener(Event event);
+        void eventListener(KeyBind event);
         void loadMenu();
         const MenuInfo &getMenuInfos() const;
-        ILibGame *getActualGame();
-        ILibIO *getActualGraphLib();
+        IGameModule *getActualGame();
+        IDisplayModule *getActualGraphLib();
+        void saveScore();
+        void setScore(int score);
         ~MenuArcade();
 
     protected:
     private:
+        int _score;
         void setIdx();
-        void setPlayerName(Event event);
+        void setPlayerName(KeyBind event);
         MenuInfo _menuInfos;
-        std::vector<DLLoader<ILibIO>*> _libVector;
-        std::vector<DLLoader<ILibGame>*> _gameVector;
+        std::vector<DLLoader<IDisplayModule>*> _libVector;
+        std::vector<DLLoader<IGameModule>*> _gameVector;
 };
 
 #endif /* !MENUARCADE_HPP_ */

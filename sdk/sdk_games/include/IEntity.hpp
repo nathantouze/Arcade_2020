@@ -7,7 +7,6 @@
 #ifndef OOP_ARCADE_2019_IENTITY_HPP
 #define OOP_ARCADE_2019_IENTITY_HPP
 
-#include "DLLoader.hpp"
 #include "TypeEntity.hpp"
 
 class IEntity {

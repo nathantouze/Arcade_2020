@@ -4,6 +4,7 @@
 ** File description:
 ** Created by ntouze,
 */
+
 #ifndef OOP_ARCADE_2019_LIBSFML_HPP
 #define OOP_ARCADE_2019_LIBSFML_HPP
 
@@ -12,56 +13,72 @@
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include "ILibIO.hpp"
+#include "IDisplayModule.hpp"
 #include "TypeEntity.hpp"
-#include "Event.hpp"
+#include "KeyBind.hpp"
 #include "Entity.hpp"
-#include <iostream>
+#include "Music.hpp"
 
-class LibSFML : public ILibIO {
+class LibSFML : public IDisplayModule {
     public:
-        void initWindow();
-        void display() const;
-        void drawEntity(const IEntity &entity);
-        void displayMenu(const MenuInfo &menu);
-        bool isOpen() const;
-        Event eventListener() const;
-        void clearWindow();
-        void destroyWindow();
+        /* Constructor */
         LibSFML();
+        /* Destructor */
         ~LibSFML();
+        /* Window management */
+        void initWindow();
+        void destroyWindow();
+        bool isOpen() const;
+        void oneCycleDisplay();
+        void oneCycleClear();
+        /* Draw Entity*/
+        void drawEntity(const IEntity &entity);
+        /* Event Listener */
+        KeyBind eventListener();
+        /* Display Menu Arcade */
+        void displayMenu(const MenuInfo &menu);
+
     private:
         sf::RenderWindow *_window;
         std::map<TypeEntity, sf::Font*> _fontResources;
         std::map<TypeEntity, sf::Texture*> _textureResources;
         std::map<std::string, sf::RectangleShape*> _boxMap;
         std::pair<sf::Vector2i, sf::Vector2i> _mapSize;
+        //Music _menuMusic;
         bool _isOpen;
-        sf::Vector2f setEntityPos(int posX, int posY);
+
+        /* Search and set function */
+        sf::Text searchFontAndSetText(const IEntity &entity, std::pair<std::string, std::string> info, size_t size, sf::Color color, TypeEntity type);
+        sf::Sprite searchTextureAndSetSprite(const IEntity &entity, std::string path, sf::IntRect *rect);
+        /* Map management */
         void setMap(sf::Vector2i mapPos);
-        void setBox(const MenuInfo &menu);
+        sf::Vector2f setEntityPos(int posX, int posY);
+        /* Set Menu Arcade */
         void setAttributes(sf::Vector2f pos, sf::Color color, const std::string &boxName, const MenuInfo &menu);
         void setAttributes(sf::Vector2f pos, sf::Color color, const std::string &boxName, sf::RectangleShape *rect,  size_t charSize);
-        /* Draw */
-        void drawWall(const IEntity &entity);
-        void drawBonus(const IEntity &entity);
-        void drawSnakeHead(const IEntity &entity);
-        void drawSnakeBody(const IEntity &entity);
-        void drawSnakeTail(const IEntity &entity);
-        void drawPlayer(const IEntity &entity);
-        void drawTitleMenu(const IEntity &entity);
+        void setBox(const MenuInfo &menu);
+        void setMenuBoxInfo(const std::vector<std::string> &list, const int &idx, std::string boxName, std::string text);
+        /* Draw Function*/
         void drawError(const IEntity &entity);
+        void drawBonus1(const IEntity &entity);
+        void drawPlayer1(const IEntity &entity);
+        void drawPlayer2(const IEntity &entity);
+        void drawPlayer3(const IEntity &entity);
+        void drawPlayer4(const IEntity &entity);
+        void drawTitleMenu(const IEntity &entity);
         void drawVictory(const IEntity &entity);
         void drawDefeat(const IEntity &entity);
-        void drawGnome(const IEntity &entity);
         void drawProjectile(const IEntity &entity);
-        void drawMushroom1(const IEntity &entity);
-        void drawMushroom2(const IEntity &entity);
-        void drawMushroom3(const IEntity &entity);
+        void drawWall(const IEntity &entity);
+        void drawWall1(const IEntity &entity);
+        void drawWall2(const IEntity &entity);
+        void drawWall3(const IEntity &entity);
+        /* Music management */
+        void loadMusic();
 };
 
 extern "C" {
-    ILibIO *entryPoint() {
+    IDisplayModule *entryPoint() {
         return (new LibSFML());
     }
 }

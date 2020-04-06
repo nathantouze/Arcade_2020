@@ -8,27 +8,27 @@
 #ifndef CENTIPEDE_HPP_
 #define CENTIPEDE_HPP_
 
-#include "ILibGame.hpp"
+#include "IGameModule.hpp"
 #include "Gnome.hpp"
 #include "MushroomManager.hpp"
 #include "ShootManager.hpp"
 #include "insects/InsectsManager.hpp"
 
-class Centipede : public ILibGame {
+class Centipede : public IGameModule {
     public:
         Centipede();
         ~Centipede();
-        const std::vector<Entity *> &getEntities();
-        void receiveEvent(Event event);
-        void oneCycleLoop();
-        void initGame(const std::string &username);
+        const std::vector<IEntity *> &getEntities();
+        void receiveEvent(KeyBind event);
+        bool oneCycleLoop();
+        void initGame();
+        int getScore() const;
         void closeGame();
 
     protected:
     private:
-        std::string _playerName;
         Gnome _playerGnome;
-        std::vector<Entity *> _entities;
+        std::vector<IEntity *> _entities;
         MushroomManager _mushroomManager;
         ScoreManager _scoreManager;
         ShootManager _shootManager;
@@ -37,7 +37,7 @@ class Centipede : public ILibGame {
 };
 
 extern "C" {
-    ILibGame *entryPoint() {
+    IGameModule *entryPoint() {
         return (new Centipede());
     }
 }

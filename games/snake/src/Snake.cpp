@@ -6,8 +6,6 @@
 */
 
 #include "Snake.hpp"
-#include "ScoreModule/FileManager.hpp"
-#include "ScoreModule/ScoreModule.hpp"
 #include <algorithm>
 #include <ctime>
 #include <cstdlib>
@@ -23,9 +21,13 @@ void Snake::looseGame()
     _status = LOST;
 }
 
+int Snake::getScore() const
+{
+    return _score;
+}
+
 void Snake::closeGame()
 {
-    ScoreModule::encryptScore("lib_arcade_nibbler.so", _username, _score);
     delete _map;
     delete _apple;
     _obstacles.clear();
@@ -35,49 +37,42 @@ void Snake::closeGame()
     _new_event = NO_EVENT;
     _status = CLOSED;
     _score = 0;
-    _username.clear();
 }
 
-void Snake::initGame(const std::string &username)
+void Snake::initGame()
 {
     int x = 0;
     int y = 0;
 
-    setUsername(username);
     _map = new Entity(MAP, 20, 20);
-    _apple = new Entity(BONUS, 10, 3);
+    _apple = new Entity(BONUS_1, 10, 3);
     _score = 0;
     for (int i = 0; i < 20; i++, x++) {
-        _obstacles.push_back(new Entity(WALL, x, y));
+        _obstacles.push_back(new Entity(WALL_1, x, y));
     }
     x--;
     y = 1;
     for (int i = 0; i < 19; i++, y++)
-        _obstacles.push_back(new Entity(WALL, x, y));
+        _obstacles.push_back(new Entity(WALL_1, x, y));
     x = 0;
     y = 1;
     for (int i = 0; i < 19; i++, y++)
-        _obstacles.push_back(new Entity(WALL, x, y));
+        _obstacles.push_back(new Entity(WALL_1, x, y));
     y--;
     x = 1;
     for (int i = 0; i < 18; i++, x++)
-        _obstacles.push_back(new Entity(WALL, x, y));
+        _obstacles.push_back(new Entity(WALL_1, x, y));
     _map = new Entity(MAP, 20, 20);
-    _snake.push_back(new Entity(SNAKE_HEAD, 10, 10));
-    _snake.push_back(new Entity(SNAKE_BODY, 10, 9));
-    _snake.push_back(new Entity(SNAKE_BODY, 10, 8));
-    _snake.push_back(new Entity(SNAKE_TAIL, 10, 7));
+    _snake.push_back(new Entity(PLAYER_2, 10, 10));
+    _snake.push_back(new Entity(PLAYER_3, 10, 9));
+    _snake.push_back(new Entity(PLAYER_3, 10, 8));
+    _snake.push_back(new Entity(PLAYER_4, 10, 7));
     std::srand(std::time(NULL));
     _current_event = DOWN_KEY;
     _new_event = DOWN_KEY;
     _loop_counter = 0;
     _difficulty = 5;
     _status = IN_PROGRESS;
-}
-
-void Snake::setUsername(const std::string &userName)
-{
-    _username = userName;
 }
 
 bool Snake::checkEatItself()
@@ -97,8 +92,8 @@ void Snake::grow_up(int x, int y)
     int new_apple_x = 0;
     int new_apple_y = 0;
 
-    _snake.at(_snake.size()-1)->setType(SNAKE_BODY);
-    _snake.push_back(new Entity(SNAKE_TAIL, x, y));
+    _snake.at(_snake.size()-1)->setType(PLAYER_3);
+    _snake.push_back(new Entity(PLAYER_4, x, y));
     while (pos == NOT_SET) {
         pos = SET;
         new_apple_x = rand() % 20;
@@ -107,7 +102,7 @@ void Snake::grow_up(int x, int y)
             pos = NOT_SET;
             continue;
         }
-        std::for_each(_snake.begin(), _snake.end(), [&new_apple_x, &new_apple_y, &pos] (Entity *part) {
+        std::for_each(_snake.begin(), _snake.end(), [&new_apple_x, &new_apple_y, &pos] (IEntity *part) {
             if (part->getPosX() == new_apple_x && part->getPosY() == new_apple_y)
                 pos = NOT_SET;
         });
@@ -122,7 +117,7 @@ void Snake::grow_up(int x, int y)
     }
 }
 
-void Snake::oneCycleLoop()
+bool Snake::oneCycleLoop()
 {
     if (_status == WON || _status == LOST) {}
     else if (_loop_counter == _difficulty) {
@@ -146,9 +141,10 @@ void Snake::oneCycleLoop()
         _loop_counter = 0;
     }  
     _loop_counter++;
+    return true;
 }
 
-void Snake::receiveEvent(Event event)
+void Snake::receiveEvent(KeyBind event)
 {
     if (event == LEFT_KEY || event == RIGHT_KEY || event == UP_KEY || event == DOWN_KEY) {
         if ((event == RIGHT_KEY && _current_event != LEFT_KEY) || (event == LEFT_KEY && _current_event != RIGHT_KEY) || \
@@ -157,15 +153,15 @@ void Snake::receiveEvent(Event event)
     }
 }
 
-const std::vector<Entity *> &Snake::getEntities()
+const std::vector<IEntity *> &Snake::getEntities()
 {
     _entities.clear();
     _entities.push_back(_map);
-    std::for_each(_obstacles.begin(), _obstacles.end(), [this] (Entity *obstacle) {
+    std::for_each(_obstacles.begin(), _obstacles.end(), [this] (IEntity *obstacle) {
         _entities.push_back(obstacle);
     });
     _entities.push_back(_apple);
-    std::for_each(_snake.begin(), _snake.end(), [this] (Entity *snake_part) {
+    std::for_each(_snake.begin(), _snake.end(), [this] (IEntity *snake_part) {
         _entities.push_back(snake_part);
     });
     if (_status == LOST)

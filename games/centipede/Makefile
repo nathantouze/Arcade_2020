@@ -15,8 +15,6 @@ SRCS	=	$(DIR)/Centipede.cpp			\
 			$(DIR)/MushroomManager.cpp		\
 			$(DIR)/ScoreManager.cpp			\
 			$(DIR)/Mushroom.cpp				\
-			$(DIR)/ScoreModule.cpp			\
-			$(DIR)/FileManager.cpp			\
 			$(DIR)/ShootManager.cpp			\
 			$(DIR)/insects/Centi.cpp		\
 			$(DIR)/insects/CentiManager.cpp	\
@@ -32,13 +30,13 @@ CC		=	g++
 
 RM		=	rm -rf
 
-CPPFLAGS	+= -W -Wall -Wextra -Werror -I./include/ -I./../../include/ -I./../../include/entity/ -fPIC
+CPPFLAGS	+= -W -Wall -Wextra -Werror -I./include/ -I./../../include/ -I./../../include/entity/ -fPIC -std=c++17
 
 
 all:		$(NAME)
 
 $(NAME):	$(OBJS)
-			$(CC) -o $(NAME) $(OBJS) -shared
+			$(CC) -o $(NAME) $(OBJS) -shared -rdynamic
 
 clean:
 			$(RM) $(OBJS)

@@ -30,7 +30,7 @@ CC		=	g++
 
 RM		=	rm -rf
 
-CPPFLAGS	+=	-W -Wall -Wextra -Wextra -I./include/ -I./../../include/ -I./include/entity/ -ldl -lsfml-graphics -lsfml-window -lsfml-system -lncurses -lallegro
+CXXFLAGS	+=	-W -Wall -Wextra -Wextra -I./include/ -I./../../include/ -I./include/entity/ -std=c++17 -g
 
 
 all:		$(NAME)
@@ -40,7 +40,8 @@ $(NAME):	core
 			make -C $(DIRGAME)
 
 core:		$(OBJS)
-			$(CC) -o $(NAME) $(OBJS) $(CPPFLAGS)
+			$(CC) -o $(NAME) $(OBJS) -ldl
+
 
 graphicals:
 			make -C $(DIRLIB)

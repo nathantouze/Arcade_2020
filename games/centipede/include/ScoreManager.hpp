@@ -13,7 +13,6 @@
 class ScoreManager {
     public:
         ScoreManager();
-        void saveScore(const std::string &playerName) const;
         void resetScore();
         void breakMushroom();
         void resetMushroom();

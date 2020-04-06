@@ -19,133 +19,110 @@ int NcurseLib::getmaxwidth() const
     return _maxwidth;
 }
 
-void NcurseLib::drawPlayer(const IEntity &_entity) const
+void NcurseLib::drawLetter(const IEntity &_entity, const std::string &letter) const
 {
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "P");
-}
-
-void NcurseLib::drawEnemy(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "E");
-}
-
-void NcurseLib::drawWall(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "W");
-}
-
-void NcurseLib::drawGnome(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "G");
-}
-
-void NcurseLib::drawShoot(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "|");
-}
-
-void NcurseLib::drawMushroom(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "M");
-}
-
-void NcurseLib::drawSnakeHead(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "H");
-}
-
-void NcurseLib::drawSnakeBody(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "B");
-}
-
-void NcurseLib::drawSnakeTail(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "T");
-}
-
-void NcurseLib::drawFloor(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "F");
-}
-
-void NcurseLib::drawBonus(const IEntity &_entity) const
-{
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "O");
+    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, letter.c_str());
 }
 
 void NcurseLib::drawGameWon() const
 {
-    mvprintw(PADDING_HEIGHT - 2, PADDING_WIDTH, "GAME WON");
+    init_pair(4, COLOR_GREEN, COLOR_BLACK);
+    attron(A_BOLD);
+    attron(COLOR_PAIR(4));
+    mvprintw(PADDING_HEIGHT - 2, PADDING_WIDTH + PADDING_WIDTH / 5, "GAME WON");
+    attroff(COLOR_PAIR(4));
+    attroff(A_BOLD);
 }
 
 void NcurseLib::drawGameLost() const
 {
-    mvprintw(PADDING_HEIGHT - 2, PADDING_WIDTH, "GAME LOST");
+    init_pair(3, COLOR_RED, COLOR_BLACK);
+    attron(A_BOLD);
+    attron(COLOR_PAIR(3));
+    mvprintw(PADDING_HEIGHT - 2, PADDING_WIDTH + PADDING_WIDTH / 5, "GAME LOST");
+    attroff(COLOR_PAIR(3));
+    attroff(A_BOLD);
 }
 
 void NcurseLib::drawError(const IEntity &_entity) const
 {
-    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, "E");
+    init_pair(6, COLOR_RED, COLOR_RED);
+    attron(COLOR_PAIR(6));
+    mvprintw(_entity.getPosY() + PADDING_HEIGHT, _entity.getPosX() * 2 + PADDING_WIDTH, " ");
+    attroff(COLOR_PAIR(6));
 }
 
 void NcurseLib::drawScore(const IEntity &_entity) const
 {
     std::string score = "SCORE: ";
 
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);
     score.append(std::to_string(_entity.getPosX()));
+    attron(COLOR_PAIR(1));
     mvprintw(PADDING_HEIGHT - 2, PADDING_WIDTH * 2, score.c_str());
+    attroff(COLOR_PAIR(1));
 }
 
 void NcurseLib::drawEntity(const IEntity &_entity)
 {
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);
+    init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(5, COLOR_BLACK, COLOR_WHITE);
     switch (_entity.getType()) {
-        case PLAYER:
-            drawPlayer(_entity);
+        case PLAYER_1:
+            drawLetter(_entity, "P");
             break;
-        case ENEMY:
-            drawEnemy(_entity);
+        case ENEMY_1:
+            drawLetter(_entity, "E");
             break;
-        case WALL:
-            drawWall(_entity);
+        case WALL_1:
+            drawLetter(_entity, "W");
             break;
-        case MAP:
+        case PROJECTILE:
+            drawLetter(_entity, "|");
             break;
-        case GNOME:
-            drawGnome(_entity);
+        case WALL_2:
+            attron(COLOR_PAIR(2));
+            drawLetter(_entity, "W");
+            attroff(COLOR_PAIR(2));
             break;
-        case SHOOT:
-            drawShoot(_entity);
+        case WALL_3:
+            attron(COLOR_PAIR(3));
+            drawLetter(_entity, "W");
+            attroff(COLOR_PAIR(3));
             break;
-        case MUSHROOM_1:
-            drawMushroom(_entity);
+        case WALL_4:
+            attron(COLOR_PAIR(4));
+            drawLetter(_entity, "W");
+            attroff(COLOR_PAIR(4));
             break;
-        case MUSHROOM_2:
-            drawMushroom(_entity);
+        case PLAYER_2:
+            drawLetter(_entity, "H");
             break;
-        case MUSHROOM_3:
-            drawMushroom(_entity);
+        case PLAYER_3:
+            drawLetter(_entity, "B");
             break;
-        case SNAKE_HEAD:
-            drawSnakeHead(_entity);
-            break;
-        case SNAKE_BODY:
-            drawSnakeBody(_entity);
-            break;
-        case SNAKE_TAIL:
-            drawSnakeTail(_entity);
+        case PLAYER_4:
+            drawLetter(_entity, "T");
             break;
         case FLOOR:
-            drawFloor(_entity);
+            drawLetter(_entity, "F");
             break;
-        case BONUS:
-            drawBonus(_entity);
+        case BONUS_1:
+            attron(COLOR_PAIR(5));
+            drawLetter(_entity, "B");
+            attroff(COLOR_PAIR(5));
             break;
-        case TITLEGAME:
+        case BONUS_2:
+            attron(COLOR_PAIR(2));
+            drawLetter(_entity, "B");
+            attroff(COLOR_PAIR(2));
             break;
-        case TITLEMENU:
-            break;
-        case BACKGROUND:
+        case BONUS_3:
+            attron(COLOR_PAIR(3));
+            drawLetter(_entity, "B");
+            attroff(COLOR_PAIR(3));
             break;
         case GAME_WON:
             drawGameWon();
@@ -156,16 +133,12 @@ void NcurseLib::drawEntity(const IEntity &_entity)
         case ERROR:
             drawError(_entity);
             break;
-        case SCORE:
-            drawScore(_entity);
-            break;
         default:
-            drawError(_entity);
             break;
     }
 }
 
-void NcurseLib::display() const
+void NcurseLib::oneCycleDisplay()
 {
 
 }
@@ -237,21 +210,39 @@ void NcurseLib::displayMenu(const MenuInfo &menu)
         attroff(COLOR_PAIR(2));
     } else
         mvprintw(_maxheight / 4, _maxwidth - _maxwidth / 6, "PLAY");
+
+    // SCORE
+    mvprintw(_maxheight / 2 + _maxheight / 12, _maxwidth / 2 - std::strlen("SCORE"), "SCORE");
+    if (menu.getGameScores().size() == 0)
+        mvprintw(_maxheight / 2 + _maxheight / 4, _maxwidth / 2 - std::strlen("SCORE") * 2, "No score available.");
+    else {
+        int index = 0;
+        for (std::pair<std::string, std::string> element : menu.getGameScores()) {
+            std::string score = element.first;
+            score.append(": ");
+            score.append(element.second);
+            score.append(" points");
+            mvprintw(_maxheight / 2 + _maxheight / 12 + 3 + (2 * index), _maxwidth / 2 - std::strlen("SCORE") * 2, score.c_str());
+            index++;
+        }
+    }
     attroff(A_BOLD);
 }
 
-void NcurseLib::clearWindow()
+void NcurseLib::oneCycleClear()
 {
     clear();
 }
 
-Event NcurseLib::eventListener() const
+KeyBind NcurseLib::eventListener()
 {
     int ch = getch();
 
     switch (ch) {
         case KEY_EXIT:
             return (EXIT);
+        case ' ':
+            return (SPACE);
         case KEY_LEFT:
             return (LEFT_KEY);
         case KEY_RIGHT:
@@ -275,57 +266,57 @@ Event NcurseLib::eventListener() const
         case KEY_F(6):
             return (RESTART);
         case 'a':
-            return(A_KEY);
+            return(A);
         case 'b':
-            return(B_KEY);
+            return(B);
         case 'c':
-            return(C_KEY);
+            return(C);
         case 'd':
-            return(D_KEY);
+            return(D);
         case 'e':
-            return(E_KEY);
+            return(E);
         case 'f':
-            return(F_KEY);
+            return(F);
         case 'g':
-            return(G_KEY);
+            return(G);
         case 'h':
-            return(H_KEY);
+            return(H);
         case 'i':
-            return(I_KEY);
+            return(I);
         case 'j':
-            return(J_KEY);
+            return(J);
         case 'k':
-            return(K_KEY);
+            return(K);
         case 'l':
-            return(L_KEY);
+            return(L);
         case 'm':
-            return(M_KEY);
+            return(M);
         case 'n':
-            return(N_KEY);
+            return(N);
         case 'o':
-            return(O_KEY);
+            return(O);
         case 'p':
-            return(P_KEY);
+            return(P);
         case 'q':
-            return(Q_KEY);
+            return(Q);
         case 'r':
-            return(R_KEY);
+            return(R);
         case 's':
-            return(S_KEY);
+            return(S);
         case 't':
-            return(T_KEY);
+            return(T);
         case 'u':
-            return(U_KEY);
+            return(U);
         case 'v':
-            return(V_KEY);
+            return(V);
         case 'w':
-            return(W_KEY);
+            return(W);
         case 'x':
-            return(X_KEY);
+            return(X);
         case 'y':
-            return(Y_KEY);
+            return(Y);
         case 'z':
-            return(Z_KEY);
+            return(Z);
         case KEY_BACKSPACE:
             return (RETURN);
         case 27:
@@ -365,4 +356,10 @@ NcurseLib::NcurseLib()
 
 NcurseLib::~NcurseLib()
 {
+}
+
+extern "C" {
+    IDisplayModule *entryPoint() {
+        return (new NcurseLib());
+    }
 }

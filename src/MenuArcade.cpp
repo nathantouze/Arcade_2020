@@ -12,6 +12,7 @@
 
 MenuArcade::MenuArcade()
 {
+    _score = 0;
     loadMenu();
 }
 
@@ -22,26 +23,26 @@ MenuArcade::~MenuArcade()
 void MenuArcade::launchMenu()
 {
     for (auto it : _menuInfos.getGraphList()) {
-        DLLoader<ILibIO> *loadLib = new DLLoader<ILibIO>("./lib/" + it);
+        DLLoader<IDisplayModule> *loadLib = new DLLoader<IDisplayModule>("./lib/" + it);
         _libVector.push_back(loadLib);
     }
     for (auto it : _menuInfos.getGameList()) {
-        DLLoader<ILibGame> *loadGame = new DLLoader<ILibGame>("./games/" + it);
+        DLLoader<IGameModule> *loadGame = new DLLoader<IGameModule>("./games/" + it);
         _gameVector.push_back(loadGame);
     }
 }
 
-ILibGame *MenuArcade::getActualGame()
+IGameModule *MenuArcade::getActualGame()
 {
     return (_gameVector[_menuInfos.getGameIdx()]->getInstance("entryPoint"));
 }
 
-ILibIO *MenuArcade::getActualGraphLib()
+IDisplayModule *MenuArcade::getActualGraphLib()
 {
     return (_libVector[_menuInfos.getGraphIdx()]->getInstance("entryPoint"));
 }
 
-void MenuArcade::eventListener(Event event)
+void MenuArcade::eventListener(KeyBind event)
 {
     switch (event) {
     case RIGHT_KEY:
@@ -50,7 +51,7 @@ void MenuArcade::eventListener(Event event)
         else
             _menuInfos.setActiveBoxIdx(_menuInfos.getActiveBoxIdx() + 1);
         break;
-    
+
     case LEFT_KEY:
         if (_menuInfos.getActiveBoxIdx() <= 0)
             _menuInfos.setActiveBoxIdx(3);
@@ -95,7 +96,7 @@ void MenuArcade::eventListener(Event event)
     setIdx();
 }
 
-void MenuArcade::setPlayerName(Event event)
+void MenuArcade::setPlayerName(KeyBind event)
 {
     if (event == RETURN) {
         _menuInfos.setPlayerName(_menuInfos.getPlayerName().substr(0, _menuInfos.getPlayerName().size() - 1));
@@ -104,82 +105,82 @@ void MenuArcade::setPlayerName(Event event)
     if (_menuInfos.getPlayerName().size() == 10)
         return;
     switch (event) {
-        case A_KEY:
+        case A:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'a');
             break;
-        case B_KEY:
+        case B:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'b');
             break;
-        case C_KEY:
+        case C:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'c');
             break;
-        case D_KEY:
+        case D:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'd');
             break;
-        case E_KEY:
+        case E:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'e');
             break;
-        case F_KEY:
+        case F:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'f');
             break;
-        case G_KEY:
+        case G:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'g');
             break;
-        case H_KEY:
+        case H:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'h');
             break;
-        case I_KEY:
+        case I:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'i');
             break;
-        case J_KEY:
+        case J:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'j');
             break;
-        case K_KEY:
+        case K:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'k');
             break;
-        case L_KEY:
+        case L:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'l');
             break;
-        case M_KEY:
+        case M:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'm');
             break;
-        case N_KEY:
+        case N:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'n');
             break;
-        case O_KEY:
+        case O:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'o');
             break;
-        case P_KEY:
+        case P:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'p');
             break;
-        case Q_KEY:
+        case Q:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'q');
             break;
-        case R_KEY:
+        case R:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'r');
             break;
-        case S_KEY:
+        case S:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 's');
             break;
-        case T_KEY:
+        case T:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 't');
             break;
-        case U_KEY:
+        case U:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'u');
             break;
-        case V_KEY:
+        case V:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'v');
             break;
-        case W_KEY:
+        case W:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'w');
             break;
-        case X_KEY:
+        case X:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'x');
             break;
-        case Y_KEY:
+        case Y:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'y');
             break;
-        case Z_KEY:
+        case Z:
             _menuInfos.setPlayerName(_menuInfos.getPlayerName() + 'z');
             break;
         default:
@@ -190,6 +191,17 @@ void MenuArcade::setPlayerName(Event event)
 const MenuInfo &MenuArcade::getMenuInfos() const
 {
     return _menuInfos;
+}
+
+void MenuArcade::saveScore()
+{
+    ScoreModule::encryptScore(_menuInfos.getGameList().at(_menuInfos.getGameIdx()), _menuInfos.getPlayerName(), _score);
+    _score = 0;
+}
+
+void MenuArcade::setScore(int score)
+{
+    _score = score;
 }
 
 void MenuArcade::setIdx()

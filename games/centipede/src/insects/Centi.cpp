@@ -10,7 +10,7 @@
 Centi::Centi(int length)
 {
     for (int i = 0; i < length; i++)
-        _bodyEntities.push_back(new Entity(BONUS, 15, -i));
+        _bodyEntities.push_back(new Entity(PLAYER_3, 15, -i));
     _direction = RIGHT;
 }
 
@@ -43,7 +43,7 @@ void Centi::moveCenti(int posX, int posY, ScoreManager &scoreManager)
         _bodyEntities.erase(_bodyEntities.begin());
         scoreManager.centiOnBot();
     } else 
-        _bodyEntities.insert(_bodyEntities.begin(), new Entity(BONUS, posX, posY));
+        _bodyEntities.insert(_bodyEntities.begin(), new Entity(PLAYER_3, posX, posY));
 }
 
 void Centi::oneCycleLoop(const MushroomManager &mushroomManager, ScoreManager &scoreManager)

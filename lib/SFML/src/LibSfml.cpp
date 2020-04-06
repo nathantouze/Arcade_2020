@@ -7,16 +7,70 @@
 
 #include "LibSfml.hpp"
 
+/* Constructor */
+
+LibSFML::LibSFML()
+{
+    sf::Font *font = new sf::Font();
+
+    font->loadFromFile("assets/sfml/font/BarcadeFont.ttf");
+    _fontResources[TITLEMENU] = font;
+    _boxMap["GraphLib"] = new sf::RectangleShape({(sf::Vector2f(475, 725))});
+    _boxMap["GamesLib"] = new sf::RectangleShape({(sf::Vector2f(475, 725))});
+    _boxMap["Name"] = new sf::RectangleShape({(sf::Vector2f(500, 95))});
+    _boxMap["Score"] = new sf::RectangleShape({(sf::Vector2f(600, 465))});
+    _boxMap["Play"] = new sf::RectangleShape({(sf::Vector2f(300, 100))});
+    _boxMap["ARCADE"] = new sf::RectangleShape({(sf::Vector2f(600, 125))});
+    //_menuMusic.loadMusic("assets/sfml/music/menu-arcade.ogg");
+}
+
+/* Destructor */
+
+LibSFML::~LibSFML()
+{
+}
+
+/* Window management */
+
 void LibSFML::initWindow()
 {
     _window = new sf::RenderWindow(sf::VideoMode(SFML_WINDOW_WIDTH, SFML_WINDOW_HEIGHT), "My_Arcade");
     _isOpen = true;
 }
 
-void LibSFML::display() const
+void LibSFML::destroyWindow()
+{
+    _window->close();
+    _isOpen = false;
+}
+
+void LibSFML::oneCycleDisplay()
 {
     _window->display();
 }
+
+void LibSFML::oneCycleClear()
+{
+    sf::Texture *texture = nullptr;
+    sf::Sprite sprite;
+
+    if (_textureResources.find(BACKGROUND) == _textureResources.end()) {
+        texture = new sf::Texture();
+        texture->loadFromFile("assets/sfml/sprite/menu-arcade.png");
+        _textureResources[BACKGROUND] = texture;
+    }
+    sprite.setTexture(*_textureResources[BACKGROUND]);
+    sprite.setPosition(0, 0);
+    _window->clear(sf::Color::Black);
+    _window->draw(sprite);
+}
+
+bool LibSFML::isOpen() const
+{
+    return (_isOpen);
+}
+
+/* Set and display Menu Arcade */
 
 void LibSFML::setAttributes(sf::Vector2f pos, sf::Color color, const std::string &boxName, const MenuInfo &menu)
 {
@@ -79,148 +133,66 @@ void LibSFML::setBox(const MenuInfo &menu)
     setAttributes({660, 25}, sf::Color(0, 0, 0), "ARCADE", menu);
 }
 
-void LibSFML::displayMenu(const MenuInfo &menu)
+void LibSFML::setMenuBoxInfo(const std::vector<std::string> &list, const int &idx, std::string boxName, std::string errorText)
 {
     size_t alpha = 255;
+    std::string text = "";
+
+    if (list.empty())
+        text = errorText;
+    setAttributes({(_boxMap[boxName]->getPosition().x + 25), (_boxMap[boxName]->getPosition().y + 100)}, sf::Color(0, 0, 0), text,\
+    new sf::RectangleShape({(sf::Vector2f((_boxMap[boxName]->getSize().x - 50), (_boxMap[boxName]->getSize().y - 125)))}), 25);
+    if (list.size() > 0) {
+        for (size_t index = 0; index < list.size(); index++) {
+            alpha = (idx == (int)index) ? 255 : 200;
+            setAttributes({(_boxMap[boxName]->getPosition().x + 25), ((_boxMap[boxName]->getPosition().y + 100) + index * ((_boxMap[boxName]->getSize().y - 125)/list.size()))},\
+            sf::Color(0, 0, 200, alpha), list[index],\
+            new sf::RectangleShape({(sf::Vector2f((_boxMap[boxName]->getSize().x - 50), ((_boxMap[boxName]->getSize().y - 125)/list.size())))}), 15);
+        }
+    }
+}
+
+void LibSFML::displayMenu(const MenuInfo &menu)
+{
     std::string text;
 
     setBox(menu);
-    if (menu.getGraphList().empty())
-        text = "No graphLib\n\nin directory\n\n/lib";
-    setAttributes({(_boxMap["GraphLib"]->getPosition().x + 25), (_boxMap["GraphLib"]->getPosition().y + 100)}, sf::Color(0, 0, 0), text,\
-    new sf::RectangleShape({(sf::Vector2f((_boxMap["GraphLib"]->getSize().x - 50), (_boxMap["GraphLib"]->getSize().y - 125)))}), 25);
-    if (menu.getGraphList().size() > 0) {
-        for (size_t index = 0; index < menu.getGraphList().size(); index++) {
-            alpha = (menu.getGraphIdx() == (int)index)?255:200;
-            setAttributes({(_boxMap["GraphLib"]->getPosition().x + 25), ((_boxMap["GraphLib"]->getPosition().y + 100) + index * ((_boxMap["GraphLib"]->getSize().y - 125)/menu.getGraphList().size()))},\
-            sf::Color(0, 0, 200, alpha), menu.getGraphList()[index],\
-            new sf::RectangleShape({(sf::Vector2f((_boxMap["GraphLib"]->getSize().x - 50), ((_boxMap["GraphLib"]->getSize().y - 125)/menu.getGraphList().size())))}), 15);
-        }
-    }
-    if (menu.getGameList().empty())
-        text = "No game\n\nin directory\n\n/games";
-    setAttributes({(_boxMap["GamesLib"]->getPosition().x + 25), (_boxMap["GamesLib"]->getPosition().y + 100)}, sf::Color(0, 0, 0), text,\
-    new sf::RectangleShape({(sf::Vector2f((_boxMap["GamesLib"]->getSize().x - 50), (_boxMap["GamesLib"]->getSize().y - 125)))}), 25);
-    if (menu.getGameList().size() > 0) {
-        for (size_t index = 0; index < menu.getGameList().size(); index++) {
-            alpha = (menu.getGameIdx() == (int)index)?255:200;
-            setAttributes({(_boxMap["GamesLib"]->getPosition().x + 25), ((_boxMap["GamesLib"]->getPosition().y + 100) + index * ((_boxMap["GamesLib"]->getSize().y - 125)/menu.getGameList().size()))},\
-            sf::Color(0, 0, 200, alpha), menu.getGameList()[index],\
-            new sf::RectangleShape({(sf::Vector2f((_boxMap["GamesLib"]->getSize().x - 50), ((_boxMap["GamesLib"]->getSize().y - 125)/menu.getGameList().size())))}), 15);
-        }
-    }
+    setMenuBoxInfo(menu.getGraphList(), menu.getGraphIdx(), "GraphLib", "No graphLib\n\nin directory\n\n/lib");
+    setMenuBoxInfo(menu.getGameList(), menu.getGameIdx(), "GamesLib", "No game\n\nin directory\n\n/games");
     if (menu.getGameScores().empty())
         text = "No score available";
     setAttributes({(_boxMap["Score"]->getPosition().x + 25), (_boxMap["Score"]->getPosition().y + 100)}, sf::Color(0, 0, 0), text,\
     new sf::RectangleShape({(sf::Vector2f((_boxMap["Score"]->getSize().x - 50), (_boxMap["Score"]->getSize().y - 125)))}), 25);
     if (menu.getGameScores().size() > 0) {
-        size_t index = 0;
-        for (std::pair<std::string, int> element : menu.getGameScores()) {
-            setAttributes({(_boxMap["Score"]->getPosition().x + 25), ((_boxMap["Score"]->getPosition().y + 100) + index * ((_boxMap["Score"]->getSize().y - 125)/menu.getGameScores().size()))},\
-            sf::Color(0, 0, 200), element.first + " : " + std::to_string(element.second),\
-            new sf::RectangleShape({(sf::Vector2f((_boxMap["Score"]->getSize().x - 50), ((_boxMap["Score"]->getSize().y - 125)/menu.getGameScores().size())))}), 15);
-            index++;
+        for (size_t index = 0; index < 5; index++) {
+            setAttributes({(_boxMap["Score"]->getPosition().x + 25), ((_boxMap["Score"]->getPosition().y + 100) + index * ((_boxMap["Score"]->getSize().y - 125)/5/*More generic : menu.getGameScores().size()*/))},\
+            sf::Color(0, 0, 200), menu.getGameScores()[index].first + " : " + menu.getGameScores()[index].second,\
+            new sf::RectangleShape({(sf::Vector2f((_boxMap["Score"]->getSize().x - 50), ((_boxMap["Score"]->getSize().y - 125)/5/*More generic : menu.getGameScores().size()*/)))}), 15);
         }
     }
-    drawEntity(Entity(MAP, 20, 20));
 }
 
-void LibSFML::drawPlayer(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
+/* Search and set function */
 
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/batman.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    sprite.scale(sf::Vector2f(0.35, 0.35));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawTitleMenu(const IEntity &entity)
+sf::Text LibSFML::searchFontAndSetText(const IEntity &entity, std::pair<std::string, std::string> info, size_t size, sf::Color color, TypeEntity type)
 {
     sf::Font *font = NULL;
     sf::Text text;
 
-    if (_fontResources.find(entity.getType()) == _fontResources.end()) {
+    if (_fontResources.find(type) == _fontResources.end()) {
         font = new sf::Font();
-        font->loadFromFile("assets/BarcadeFont.ttf");
+        font->loadFromFile(info.first);
         _fontResources[entity.getType()] = font;
     }
     text.setFont(*_fontResources[entity.getType()]);
-    text.setString("ARCADE");
-    text.setFillColor(sf::Color::White);
-    text.setCharacterSize(24);
+    text.setString(info.second);
+    text.setFillColor(color);
+    text.setCharacterSize(size);
     text.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(text);
+    return (text);
 }
 
-void LibSFML::drawError(const IEntity &entity)
-{
-    sf::Font *font = NULL;
-    sf::Text text;
-
-    if (_fontResources.find(ERROR) == _fontResources.end()) {
-        font = new sf::Font();
-        font->loadFromFile("assets/BarcadeFont.ttf");
-        _fontResources[ERROR] = font;
-    }
-    text.setFont(*_fontResources[entity.getType()]);
-    text.setString("Error");
-    text.setFillColor(sf::Color::White);
-    text.setCharacterSize(24);
-    text.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(text);
-}
-
-void LibSFML::drawWall(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/wall.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawBonus(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/snake-graphics.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    sprite.setTextureRect(sf::IntRect(3, 195, 56, 60));
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawSnakeHead(const IEntity &entity)
+sf::Sprite LibSFML::searchTextureAndSetSprite(const IEntity &entity, std::string path, sf::IntRect *rect)
 {
     sf::Texture *texture = NULL;
     sf::Sprite sprite;
@@ -228,206 +200,22 @@ void LibSFML::drawSnakeHead(const IEntity &entity)
 
     if (_textureResources.find(entity.getType()) == _textureResources.end()) {
         texture = new sf::Texture();
-        texture->loadFromFile("assets/snake-head.png");
+        texture->loadFromFile(path);
         _textureResources[entity.getType()] = texture;
     }
     sprite.setTexture(*_textureResources[entity.getType()]);
+    if (rect)
+        sprite.setTextureRect(*rect);
     if (sprite.getLocalBounds().width > _mapSize.second.x)
         scale = _mapSize.second.x / sprite.getLocalBounds().width;
     else if (sprite.getLocalBounds().height > _mapSize.second.y)
         scale = _mapSize.second.y / sprite.getLocalBounds().height;
     sprite.scale(sf::Vector2f(scale, scale));
     sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
+    return (sprite);
 }
 
-void LibSFML::drawSnakeBody(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/snake-graphics.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    sprite.setTextureRect(sf::IntRect(64, 5, 52, 52));
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawSnakeTail(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/snake-tail.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawVictory(const IEntity &entity)
-{
-    sf::Font *font = NULL;
-    sf::Text text;
-
-    if (_fontResources.find(entity.getType()) == _fontResources.end()) {
-        font = new sf::Font();
-        font->loadFromFile("assets/BarcadeFont.ttf");
-        _fontResources[entity.getType()] = font;
-    }
-    text.setFont(*_fontResources[entity.getType()]);
-    text.setString("GAME WON");
-    text.setFillColor(sf::Color::Yellow);
-    text.setCharacterSize(60);
-    text.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(text);
-}
-
-void LibSFML::drawDefeat(const IEntity &entity)
-{
-    sf::Font *font = NULL;
-    sf::Text text;
-
-    if (_fontResources.find(entity.getType()) == _fontResources.end()) {
-        font = new sf::Font();
-        font->loadFromFile("assets/BarcadeFont.ttf");
-        _fontResources[entity.getType()] = font;
-    }
-    text.setFont(*_fontResources[entity.getType()]);
-    text.setString("GAME LOST");
-    text.setFillColor(sf::Color::Red);
-    text.setCharacterSize(60);
-    text.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(text);
-}
-
-void LibSFML::drawGnome(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/gnome.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawProjectile(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/projectile.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawMushroom1(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/mushrooms.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    sprite.setTextureRect(sf::IntRect(0, 0, 31, 34));
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawMushroom2(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/mushrooms.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    sprite.setTextureRect(sf::IntRect(31, 0, 31, 34));
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
-void LibSFML::drawMushroom3(const IEntity &entity)
-{
-    sf::Texture *texture = NULL;
-    sf::Sprite sprite;
-    float scale = 1;
-
-    if (_textureResources.find(entity.getType()) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/mushrooms.png");
-        _textureResources[entity.getType()] = texture;
-    }
-    sprite.setTexture(*_textureResources[entity.getType()]);
-    sprite.setTextureRect(sf::IntRect(62, 0, 31, 34));
-    if (sprite.getLocalBounds().width > _mapSize.second.x)
-        scale = _mapSize.second.x / sprite.getLocalBounds().width;
-    else if (sprite.getLocalBounds().height > _mapSize.second.y)
-        scale = _mapSize.second.y / sprite.getLocalBounds().height;
-    sprite.scale(sf::Vector2f(scale, scale));
-    sprite.setPosition(setEntityPos(entity.getPosX(), entity.getPosY()));
-    _window->draw(sprite);
-}
-
+/* Map management */
 
 sf::Vector2f LibSFML::setEntityPos(int posX, int posY)
 {
@@ -443,32 +231,129 @@ void LibSFML::setMap(sf::Vector2i mapPos)
     _mapSize = dataMap;
 }
 
+/* Draw Function */
+
+void LibSFML::drawError(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/error.png", nullptr);
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawTitleMenu(const IEntity &entity)
+{
+    sf::Text text = searchFontAndSetText(entity, std::pair<std::string, std::string>("assets/sfml/font/BarcadeFont.ttf", "ARCADE"), 24, sf::Color::White, entity.getType());
+
+    _window->draw(text);
+}
+
+void LibSFML::drawBonus1(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/player3andbonus1.png", new sf::IntRect(3, 195, 56, 60));
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawPlayer2(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/player2.png", nullptr);
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawPlayer3(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/player3andbonus1.png", new sf::IntRect(64, 5, 52, 52));
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawPlayer4(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/player4.png", nullptr);
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawVictory(const IEntity &entity)
+{
+    sf::Text text = searchFontAndSetText(entity, std::pair<std::string, std::string>("assets/sfml/font/BarcadeFont.ttf", "GAME WON"), 60, sf::Color::Yellow, entity.getType());
+
+    _window->draw(text);
+}
+
+void LibSFML::drawDefeat(const IEntity &entity)
+{
+    sf::Text text = searchFontAndSetText(entity, std::pair<std::string, std::string>("assets/sfml/font/BarcadeFont.ttf", "GAME LOST"), 60, sf::Color::Red, entity.getType());
+
+    _window->draw(text);
+}
+
+void LibSFML::drawPlayer1(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/player1.png", nullptr);
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawProjectile(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/projectile.png", nullptr);
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawWall(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/wall.png", nullptr);
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawWall1(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/mushrooms.png", new sf::IntRect(0, 0, 31, 34));
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawWall2(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/mushrooms.png", new sf::IntRect(31, 0, 31, 34));
+
+    _window->draw(sprite);
+}
+
+void LibSFML::drawWall3(const IEntity &entity)
+{
+    sf::Sprite sprite = searchTextureAndSetSprite(entity, "assets/sfml/sprite/mushrooms.png", new sf::IntRect(62, 0, 31, 34));
+
+    _window->draw(sprite);
+}
+
 void LibSFML::drawEntity(const IEntity &entity)
 {
     switch (entity.getType()) {
-    case PLAYER:
-        drawPlayer(entity);
-        break;
     case TITLEMENU:
         drawTitleMenu(entity);
         break;
     case MAP:
         setMap({entity.getPosX(), entity.getPosY()});
         break;
-    case WALL:
-        drawWall(entity);
+    case BONUS_1:
+        drawBonus1(entity);
         break;
-    case BONUS:
-        drawBonus(entity);
+    case PLAYER_1:
+        drawPlayer1(entity);
         break;
-    case SNAKE_HEAD:
-        drawSnakeHead(entity);
+    case PLAYER_2:
+        drawPlayer2(entity);
         break;
-    case SNAKE_BODY:
-        drawSnakeBody(entity);
+    case PLAYER_3:
+        drawPlayer3(entity);
         break;
-    case SNAKE_TAIL:
-        drawSnakeTail(entity);
+    case PLAYER_4:
+        drawPlayer4(entity);
         break;
     case GAME_WON:
         drawVictory(entity);
@@ -476,20 +361,20 @@ void LibSFML::drawEntity(const IEntity &entity)
     case GAME_LOST:
         drawDefeat(entity);
         break;
-    case GNOME:
-        drawGnome(entity);
-        break;
-    case SHOOT:
+    case PROJECTILE:
         drawProjectile(entity);
         break;
-    case MUSHROOM_1:
-        drawMushroom1(entity);
+    case WALL_1:
+        drawWall(entity);
         break;
-    case MUSHROOM_2:
-        drawMushroom2(entity);
+    case WALL_2:
+        drawWall1(entity);
         break;
-    case MUSHROOM_3:
-        drawMushroom3(entity);
+    case WALL_3:
+        drawWall2(entity);
+        break;
+    case WALL_4:
+        drawWall3(entity);
         break;
     default:
         drawError(entity);
@@ -497,12 +382,9 @@ void LibSFML::drawEntity(const IEntity &entity)
     }
 }
 
-bool LibSFML::isOpen() const
-{
-    return (_isOpen);
-}
+/* Event Listener */
 
-Event LibSFML::eventListener() const
+KeyBind LibSFML::eventListener()
 {
     sf::Event event;
 
@@ -538,57 +420,57 @@ Event LibSFML::eventListener() const
             case sf::Keyboard::F6:
                 return (RESTART);
             case sf::Keyboard::A:
-                return(A_KEY);
+                return(A);
             case sf::Keyboard::B:
-                return(B_KEY);
+                return(B);
             case sf::Keyboard::C:
-                return(C_KEY);
+                return(C);
             case sf::Keyboard::D:
-                return(D_KEY);
+                return(D);
             case sf::Keyboard::E:
-                return(E_KEY);
+                return(E);
             case sf::Keyboard::F:
-                return(F_KEY);
+                return(F);
             case sf::Keyboard::G:
-                return(G_KEY);
+                return(G);
             case sf::Keyboard::H:
-                return(H_KEY);
+                return(H);
             case sf::Keyboard::I:
-                return(I_KEY);
+                return(I);
             case sf::Keyboard::J:
-                return(J_KEY);
+                return(J);
             case sf::Keyboard::K:
-                return(K_KEY);
+                return(K);
             case sf::Keyboard::L:
-                return(L_KEY);
+                return(L);
             case sf::Keyboard::M:
-                return(M_KEY);
+                return(M);
             case sf::Keyboard::N:
-                return(N_KEY);
+                return(N);
             case sf::Keyboard::O:
-                return(O_KEY);
+                return(O);
             case sf::Keyboard::P:
-                return(P_KEY);
+                return(P);
             case sf::Keyboard::Q:
-                return(Q_KEY);
+                return(Q);
             case sf::Keyboard::R:
-                return(R_KEY);
+                return(R);
             case sf::Keyboard::S:
-                return(S_KEY);
+                return(S);
             case sf::Keyboard::T:
-                return(T_KEY);
+                return(T);
             case sf::Keyboard::U:
-                return(U_KEY);
+                return(U);
             case sf::Keyboard::V:
-                return(V_KEY);
+                return(V);
             case sf::Keyboard::W:
-                return(W_KEY);
+                return(W);
             case sf::Keyboard::X:
-                return(X_KEY);
+                return(X);
             case sf::Keyboard::Y:
-                return(Y_KEY);
+                return(Y);
             case sf::Keyboard::Z:
-                return(Z_KEY);
+                return(Z);
             case sf::Keyboard::BackSpace:
                 return (RETURN);
             default:
@@ -599,42 +481,4 @@ Event LibSFML::eventListener() const
     return (NO_EVENT);
 }
 
-void LibSFML::clearWindow()
-{
-    sf::Texture *texture = nullptr;
-    sf::Sprite sprite;
-
-    if (_textureResources.find(BACKGROUND) == _textureResources.end()) {
-        texture = new sf::Texture();
-        texture->loadFromFile("assets/menu-arcade.png");
-        _textureResources[BACKGROUND] = texture;
-    }
-    sprite.setTexture(*_textureResources[BACKGROUND]);
-    sprite.setPosition(0, 0);
-    _window->clear(sf::Color::Black);
-    _window->draw(sprite);
-}
-
-void LibSFML::destroyWindow()
-{
-    _window->close();
-    _isOpen = false;
-}
-
-LibSFML::LibSFML()
-{
-    sf::Font *font = new sf::Font();
-
-    font->loadFromFile("assets/BarcadeFont.ttf");
-    _fontResources[TITLEMENU] = font;
-    _boxMap["GraphLib"] = new sf::RectangleShape({(sf::Vector2f(475, 725))});
-    _boxMap["GamesLib"] = new sf::RectangleShape({(sf::Vector2f(475, 725))});
-    _boxMap["Name"] = new sf::RectangleShape({(sf::Vector2f(500, 95))});
-    _boxMap["Score"] = new sf::RectangleShape({(sf::Vector2f(600, 465))});
-    _boxMap["Play"] = new sf::RectangleShape({(sf::Vector2f(300, 100))});
-    _boxMap["ARCADE"] = new sf::RectangleShape({(sf::Vector2f(600, 125))});
-}
-
-LibSFML::~LibSFML()
-{
-}
+/* END_OF_FILE */

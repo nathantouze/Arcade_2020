@@ -8,17 +8,18 @@
 #ifndef SNAKE_HPP_
 #define SNAKE_HPP_
 
-#include "ILibGame.hpp"
+#include "IGameModule.hpp"
+#include <vector>
 
-class Snake : public ILibGame {
+class Snake : public IGameModule {
     public:
         Snake();
         ~Snake();
-        const std::vector<Entity *> &getEntities();
-        void setUsername(const std::string &username);
-        void receiveEvent(Event event);
-        void oneCycleLoop();
-        void initGame(const std::string &username);
+        void receiveEvent(KeyBind key);
+        const std::vector<IEntity *> &getEntities();
+        bool oneCycleLoop();
+        int getScore() const;
+        void initGame();
         void closeGame();
 
     protected:
@@ -32,14 +33,13 @@ class Snake : public ILibGame {
         int _difficulty;
         int _score;
         GameStatus _status;
-        std::string _username;
-        Event _current_event;
-        Event _new_event;
+        KeyBind _current_event;
+        KeyBind _new_event;
         Entity *_map;
         Entity *_apple;
-        std::vector<Entity *> _obstacles;
-        std::vector<Entity *> _snake;
-        std::vector<Entity *> _entities;
+        std::vector<IEntity *> _obstacles;
+        std::vector<IEntity *> _snake;
+        std::vector<IEntity *> _entities;
 };
 
 enum ApplePos {
@@ -49,7 +49,7 @@ enum ApplePos {
 };
 
 extern "C" {
-    ILibGame *entryPoint() {
+    IGameModule *entryPoint() {
         return (new Snake());
     }
 }

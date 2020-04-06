@@ -16,41 +16,30 @@
 #include <thread>
 #include <unordered_map>
 #include <iostream>
-#include "ILibIO.hpp"
+#include "IDisplayModule.hpp"
 #include "TypeEntity.hpp"
-#include "Event.hpp"
+#include "KeyBind.hpp"
 #include "Entity.hpp"
 
 #define PADDING_HEIGHT _maxheight / 6
 #define PADDING_WIDTH _maxwidth / 2.5
 
-class NcurseLib: public ILibIO {
+class NcurseLib: public IDisplayModule {
 	public:
 		NcurseLib();
 		~NcurseLib();
-        void initWindow();
-        void display() const;
-        void drawEntity(const IEntity &entity);
-        void displayMenu(const MenuInfo &menu);
-        Event eventListener() const;
-        void clearWindow();
-        void destroyWindow();
         bool isOpen() const;
+        void drawEntity(const IEntity &ent_1);
+        KeyBind eventListener();
+        void oneCycleDisplay();
+        void displayMenu(const MenuInfo &menuInfo);
+        void oneCycleClear();
+        void initWindow();
+        void destroyWindow();
         int getmaxheight() const;
         int getmaxwidth() const;
     private:
-        void drawPlayer(const IEntity &_entity) const;
-        void drawEnemy(const IEntity &_entity) const;
-        void drawWall(const IEntity &_entity) const;
-        void drawMap(const IEntity &_entity) const;
-        void drawGnome(const IEntity &_entity) const;
-        void drawShoot(const IEntity &_entity) const;
-        void drawMushroom(const IEntity &_entity) const;
-        void drawSnakeHead(const IEntity &_entity) const;
-        void drawSnakeBody(const IEntity &_entity) const;
-        void drawSnakeTail(const IEntity &_entity) const;
-        void drawFloor(const IEntity &_entity) const;
-        void drawBonus(const IEntity &_entity) const;
+        void drawLetter(const IEntity &_entity, const std::string &letter) const;
         void drawGameWon() const;
         void drawGameLost() const;
         void drawError(const IEntity &_entity) const;
@@ -60,10 +49,10 @@ class NcurseLib: public ILibIO {
         bool _open;
 };
 
-extern "C" {
-    ILibIO *entryPoint() {
-        return (new NcurseLib());
-    }
-}
+// extern "C" {
+//     IDisplayModule *entryPoint() {
+//         return (new NcurseLib());
+//     }
+// }
 
 #endif /* !NCURSESCLASS_HPP_ */

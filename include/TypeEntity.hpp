@@ -8,27 +8,29 @@
 #define OOP_ARCADE_2019_TYPEENTITY_HPP
 
 enum TypeEntity {
-    PLAYER,
-    ENEMY,
-    WALL,
-    MAP,
-    GNOME,
-    SHOOT,
-    MUSHROOM_1,
-    MUSHROOM_2,
-    MUSHROOM_3,
-    SNAKE_HEAD,
-    SNAKE_BODY,
-    SNAKE_TAIL,
+    PLAYER_1,
+    ENEMY_1,
+    ENEMY_2,
+    ENEMY_3,
+    WALL_1,
     FLOOR,
-    BONUS,
-    TITLEMENU,
-    TITLEGAME,
+    BONUS_1,
+    BONUS_2,
+    BONUS_3,
+    PROJECTILE,
+    MAP,
+    WALL_2,
+    WALL_3,
+    WALL_4,
+    PLAYER_2,
+    PLAYER_3,
+    PLAYER_4,
     BACKGROUND,
     GAME_WON,
     GAME_LOST,
-    ERROR,
-    SCORE
+    TITLEMENU,
+    TITLEGAME,
+    ERROR
 };
 
 #endif //OOP_ARCADE_2019_TYPEENTITY_HPP

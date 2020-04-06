@@ -28,7 +28,7 @@ const std::vector<std::string> &MenuInfo::getGameList() const
     return _gameList;
 }
 
-const std::unordered_map<std::string, int> &MenuInfo::getGameScores() const
+const std::vector<std::pair<std::string, std::string>> &MenuInfo::getGameScores() const
 {
     return _gameScores;
 }
@@ -65,7 +65,7 @@ void MenuInfo::setGameList(std::vector<std::string> gameList)
     _gameList = std::move(gameList);
 }
 
-void MenuInfo::setGameScores(std::unordered_map<std::string, int> gameScores)
+void MenuInfo::setGameScores(std::vector<std::pair<std::string, std::string>> gameScores)
 {
     _gameScores = std::move(gameScores);
 }

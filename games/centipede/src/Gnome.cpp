@@ -7,7 +7,7 @@
 
 #include "Gnome.hpp"
 
-Gnome::Gnome() : Entity(GNOME, 15, 31)
+Gnome::Gnome() : Entity(TypeEntity::PLAYER_1, 15, 31)
 {
 }
 

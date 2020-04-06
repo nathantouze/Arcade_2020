@@ -9,13 +9,13 @@
 #define CORE_HPP_
 
 #include <string>
-#include "ILibIO.hpp"
-#include "ILibGame.hpp"
+#include "IDisplayModule.hpp"
+#include "IGameModule.hpp"
 #include "MenuArcade.hpp"
 
 class Core {
     public:
-        Core(ILibIO *libGraphical);
+        Core(IDisplayModule *libGraphical);
         void launchMenu();
         void launchGame();
         void loopCore();
@@ -23,11 +23,11 @@ class Core {
 
     protected:
     private:
-        ILibIO *_graphicalLib;
-        ILibGame *_gameLib;
+        IDisplayModule *_graphicalLib;
+        IGameModule *_gameLib;
         MenuArcade _menuArcade;
         bool _isMenuActive;
-        bool manageEventOnCore(Event event);
+        bool manageEventOnCore(KeyBind event);
         void closeCore();
         void oneLoop();
         void restartGame();

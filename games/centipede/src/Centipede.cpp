@@ -7,15 +7,19 @@
 
 #include "Centipede.hpp"
 
-const std::vector<Entity *> &Centipede::getEntities()
+int Centipede::getScore() const
+{
+    return _scoreManager.getScore();
+}
+
+const std::vector<IEntity *> &Centipede::getEntities()
 {
     _entities.clear();
     _entities.push_back(new Entity(MAP, 30, 31));
-    _entities.push_back(new Entity(SCORE, _scoreManager.getScore(), 0));
     if (_insectsManager.getCentiKill() == 20) {
-        _entities.push_back(new Entity(GAME_WON, 5, 15));
+        _entities.push_back(new Entity(GAME_WON, 10, 15));
     } else if (_playerGnome.isAlive() == false) {
-        _entities.push_back(new Entity(GAME_LOST, 5, 15));
+        _entities.push_back(new Entity(GAME_LOST, 10, 15));
     } else {
         _entities.push_back(_playerGnome.getEntity());
         for (auto it : _mushroomManager.getMushroomsAsEntities())
@@ -28,19 +32,31 @@ const std::vector<Entity *> &Centipede::getEntities()
     return (_entities);
 }
 
-void Centipede::receiveEvent(Event event)
+void Centipede::receiveEvent(KeyBind event)
 {
     switch (event) {
     case UP_KEY:
         _playerGnome.moveUp(_mushroomManager);
         break;
-    case DOWN_KEY:
-        _playerGnome.moveDown(_mushroomManager);
+    case ARROWUP:
+        _playerGnome.moveUp(_mushroomManager);
         break;
     case RIGHT_KEY:
         _playerGnome.moveRight(_mushroomManager);
         break;
+    case ARROWRIGHT:
+        _playerGnome.moveRight(_mushroomManager);
+        break;
+    case DOWN_KEY:
+        _playerGnome.moveDown(_mushroomManager);
+        break;
+    case ARROWDOWN:
+        _playerGnome.moveDown(_mushroomManager);
+        break;
     case LEFT_KEY:
+        _playerGnome.moveLeft(_mushroomManager);
+        break;
+    case ARROWLEFT:
         _playerGnome.moveLeft(_mushroomManager);
         break;
     case SPACE:
@@ -52,26 +68,29 @@ void Centipede::receiveEvent(Event event)
     }
 }
 
-void Centipede::oneCycleLoop()
+bool Centipede::oneCycleLoop()
 {
-    if (_insectsManager.getCentiKill() == 20) {
-        return;
-    }
-    if (_playerGnome.isAlive() == false) {
-        return;
-    }
+    int difficulty = 3;
+    if (_insectsManager.getCentiKill() == 20)
+        return true;
+    if (_playerGnome.isAlive() == false)
+        return true;
+    if (_insectsManager.getCentiKill() > 5 && _insectsManager.getCentiKill() <= 10)
+        difficulty = 2;
+    else if (_insectsManager.getCentiKill() > 10)
+        difficulty = 1;
     _shootManager.oneCycleLoop(_mushroomManager, _scoreManager, _insectsManager);
-    if (_counter == 1) {
+    if (_counter == difficulty) {
         _insectsManager.oneCycleLoop(_mushroomManager, _scoreManager);
         _counter = 0;
     }
     _playerGnome.setIsAlive(!_insectsManager.isCenti(_playerGnome.getPosX(), _playerGnome.getPosY()));
     _counter++;
+    return true;
 }
 
-void Centipede::initGame(const std::string &username)
+void Centipede::initGame()
 {
-    _playerName = username;
     _playerGnome.initGnome();
     _mushroomManager.initRandomMushrooms();
     _insectsManager.setCentiKill(0);
@@ -82,7 +101,6 @@ void Centipede::closeGame()
 {
     _mushroomManager.deleteAllMushroom();
     _insectsManager.destroyAllInsects();
-    _scoreManager.saveScore(_playerName);
     _scoreManager.resetScore();
 }
 

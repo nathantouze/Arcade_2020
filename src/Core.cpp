@@ -13,7 +13,7 @@
 #include "TimerFPS.hpp"
 #include <iostream>
 
-Core::Core(ILibIO *libGraphical) : _graphicalLib(libGraphical), _gameLib(nullptr)
+Core::Core(IDisplayModule *libGraphical) : _graphicalLib(libGraphical), _gameLib(nullptr)
 {
     _isMenuActive = true;
     _menuArcade.launchMenu();
@@ -25,36 +25,40 @@ Core::~Core()
 
 void Core::launchMenu()
 {
-    if (_isMenuActive == false)
+    if (_isMenuActive == false) {
+        _menuArcade.saveScore();
         _gameLib->closeGame();
+    }
     _isMenuActive = true;
 } 
 
 void Core::launchPrevGame()
 {
     while (_menuArcade.getMenuInfos().getActiveBoxIdx() != 1)
-        _menuArcade.eventListener(Event::RIGHT_KEY);
-    _menuArcade.eventListener(Event::UP_KEY);
+        _menuArcade.eventListener(KeyBind::RIGHT_KEY);
+    _menuArcade.eventListener(KeyBind::UP_KEY);
     _gameLib->closeGame();
+    _menuArcade.saveScore();
     _gameLib = _menuArcade.getActualGame();
-    _gameLib->initGame(_menuArcade.getMenuInfos().getPlayerName());
+    _gameLib->initGame();
 }
 
 void Core::launchNextGame()
 {
     while (_menuArcade.getMenuInfos().getActiveBoxIdx() != 1)
-        _menuArcade.eventListener(Event::RIGHT_KEY);
-    _menuArcade.eventListener(Event::DOWN_KEY);
+        _menuArcade.eventListener(KeyBind::RIGHT_KEY);
+    _menuArcade.eventListener(KeyBind::DOWN_KEY);
     _gameLib->closeGame();
+    _menuArcade.saveScore();
     _gameLib = _menuArcade.getActualGame();
-    _gameLib->initGame(_menuArcade.getMenuInfos().getPlayerName());
+    _gameLib->initGame();
 }
 
 void Core::launchPrevLib()
 {
     while (_menuArcade.getMenuInfos().getActiveBoxIdx() != 0)
-        _menuArcade.eventListener(Event::RIGHT_KEY);
-    _menuArcade.eventListener(Event::UP_KEY);
+        _menuArcade.eventListener(KeyBind::RIGHT_KEY);
+    _menuArcade.eventListener(KeyBind::UP_KEY);
     _graphicalLib->destroyWindow();
     _graphicalLib = _menuArcade.getActualGraphLib();
     _graphicalLib->initWindow();
@@ -63,8 +67,8 @@ void Core::launchPrevLib()
 void Core::launchNextLib()
 {
     while (_menuArcade.getMenuInfos().getActiveBoxIdx() != 0)
-        _menuArcade.eventListener(Event::RIGHT_KEY);
-    _menuArcade.eventListener(Event::DOWN_KEY);
+        _menuArcade.eventListener(KeyBind::RIGHT_KEY);
+    _menuArcade.eventListener(KeyBind::DOWN_KEY);
     _graphicalLib->destroyWindow();
     _graphicalLib = _menuArcade.getActualGraphLib();
     _graphicalLib->initWindow();
@@ -82,19 +86,20 @@ void Core::launchGame()
         }
         _isMenuActive = false;
         _gameLib = _menuArcade.getActualGame();
-        _gameLib->initGame(menuInfo.getPlayerName());
+        _gameLib->initGame();
     }
 }
 
 void Core::restartGame()
 {
     _gameLib->closeGame();
-    _gameLib->initGame(_menuArcade.getMenuInfos().getPlayerName());
+    _menuArcade.saveScore();
+    _gameLib->initGame();
 }
 
 void Core::oneLoop()
 {
-    Event event = _graphicalLib->eventListener();
+    KeyBind event = _graphicalLib->eventListener();
     if (manageEventOnCore(event) == false) {
         if (_isMenuActive == true)
             _menuArcade.eventListener(event);
@@ -103,16 +108,17 @@ void Core::oneLoop()
     }
     if (_graphicalLib->isOpen() == false)
         return;
-    _graphicalLib->clearWindow();
+    _graphicalLib->oneCycleClear();
     if (_isMenuActive == true) {
         _graphicalLib->displayMenu(_menuArcade.getMenuInfos());
     } else {
         _gameLib->oneCycleLoop();
-        std::vector<Entity *> entities = _gameLib->getEntities();
+        std::vector<IEntity *> entities = _gameLib->getEntities();
+        _menuArcade.setScore(_gameLib->getScore());
         for (auto it : entities)
             _graphicalLib->drawEntity(*it);
     }
-    _graphicalLib->display();
+    _graphicalLib->oneCycleDisplay();
 }
 
 void Core::loopCore()
@@ -125,12 +131,34 @@ void Core::loopCore()
                 oneLoop();
             }
     } catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 }
 
-bool Core::manageEventOnCore(Event event)
+bool Core::manageEventOnCore(KeyBind event)
 {
+    if (event == ARROWDOWN)
+        event = DOWN_KEY;
+    if (event == ARROWLEFT)
+        event = LEFT_KEY;
+    if (event == ARROWRIGHT)
+        event = RIGHT_KEY;
+    if (event == ARROWUP)
+        event = UP_KEY;
+    if (event == F1)
+        event = PREV_LIB;
+    if (event == F2)
+        event = NEXT_LIB;
+    if (event == F3)
+        event = PREV_GAME;
+    if (event == F4)
+        event = NEXT_GAME;
+    if (event == F5)
+        event = RESTART;
+    if (event == F6)
+        event = MENU;
+    if (event == ENTER)
+        event = VALID;
     if (_isMenuActive == true) {
         switch (event) {
         case NO_EVENT:

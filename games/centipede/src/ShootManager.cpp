@@ -7,7 +7,7 @@
 
 #include "ShootManager.hpp"
 
-ShootManager::ShootManager() : Entity(SHOOT, 0, 0), _active(false)
+ShootManager::ShootManager() : Entity(PROJECTILE, 0, 0), _active(false)
 {
 }
 

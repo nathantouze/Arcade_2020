@@ -7,8 +7,7 @@
 
 #include "Mushroom.hpp"
 
-//gerer les bons typeentity
-Mushroom::Mushroom(int posX, int posY) : Entity(MUSHROOM_1, posX, posY), _lives(5)
+Mushroom::Mushroom(int posX, int posY) : Entity(TypeEntity::WALL_2, posX, posY), _lives(5)
 {
 }
 
@@ -26,9 +25,9 @@ void Mushroom::setLives(int lives)
     _lives = lives;
 
     if (_lives == 5 || _lives == 4)
-        setType(MUSHROOM_1);
+        setType(WALL_2);
     if (_lives == 3 || _lives == 2)
-        setType(MUSHROOM_2);
+        setType(WALL_3);
     if (_lives == 1)
-        setType(MUSHROOM_3);
+        setType(WALL_4);
 }

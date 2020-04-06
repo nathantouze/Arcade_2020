@@ -9,13 +9,13 @@ SFMLNAME	=	lib_arcade_sfml.so
 
 NCURSENAME	=	lib_arcade_ncurse.so
 
-ALLEGRONAME	=	lib_arcade_allegro5.so
+ALLEGRONAME	=	lib_arcade_allegro.so
 
 SFMLDIR		=	./SFML
 
 NCURSEDIR	=	./Ncurse
 
-ALLEGRODIR	=	./allegro5
+ALLEGRODIR	=	./Allegro
 
 RM			=	rm -rf
 
@@ -31,6 +31,7 @@ clean:
 				make clean -C $(SFMLDIR)
 				make clean -C $(NCURSEDIR)
 				make clean -C $(ALLEGRODIR)
+				
 
 fclean:
 				make fclean -C $(SFMLDIR)

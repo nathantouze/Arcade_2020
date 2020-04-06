@@ -16,7 +16,7 @@
 namespace ScoreModule {
 
     void encryptScore(const std::string &gameName, const std::string &playerName, int playerScore);
-    const std::unordered_map<std::string, int> getScoreOfGame(const std::string &gameName);
+    const std::vector<std::pair<std::string, std::string>> getScoreOfGame(const std::string &gameName);
 
 }
 std::string encryptNumber(int number);

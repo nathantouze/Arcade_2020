@@ -22,7 +22,7 @@ class DLLoader {
         DLLoader<T>(const std::string &libraryPath) try : _libraryPath(libraryPath), _handle(NULL) {
             _handle = dlopen(_libraryPath.c_str(), RTLD_GLOBAL | RTLD_LAZY);
             if (!_handle)
-                throw DLLoaderException("Can't open " + _libraryPath, "DLLoader");
+                throw DLLoaderException(dlerror(), "DLLoader");
         } catch (DLLoaderException &e) {
             throw e;
         }; 
